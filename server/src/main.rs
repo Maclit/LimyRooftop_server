@@ -2,7 +2,7 @@ mod api;
 mod repository;
 mod database;
 mod services;
-
+mod entities;
 
 use actix_web::{App, HttpServer};
 use api::user::{info, login, register};
