@@ -1,4 +1,4 @@
-use actix_web::{ post, get, HttpResponse };
+use actix_web::{post, get, HttpResponse };
 
 #[post("/api/users/v1/register")]
 pub async fn register() -> HttpResponse {
@@ -11,6 +11,6 @@ pub async fn login() -> HttpResponse {
 }
 
 #[get("/api/users/v1/me")]
-pub async fn user_info() -> HttpResponse {
+pub async fn info() -> HttpResponse {
     HttpResponse::Ok().body("OK")
 }
