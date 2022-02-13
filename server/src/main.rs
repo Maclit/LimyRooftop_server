@@ -1,14 +1,19 @@
-mod api;
-mod repository;
-mod database;
-mod services;
-mod entities;
-
+use std::process::exit;
 use actix_web::{App, HttpServer};
-use api::user::{info, login, register};
+
+mod api;
+mod database;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    match database::initialize_database() {
+        Ok(_) => { println!("Database initialized successfully!"); }
+        Err(_) => {
+            println!("Failed to initialize database.");
+            exit(1);
+        }
+    };
+
     HttpServer::new(|| {
         App::new()
             .service(api::user::register)
