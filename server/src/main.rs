@@ -2,11 +2,10 @@ use std::process::exit;
 use actix_web::{App, HttpServer};
 
 mod api;
-mod database;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    match database::initialize_database() {
+    match api::database::initialize_database() {
         Ok(_) => { println!("Database initialized successfully!"); }
         Err(_) => {
             println!("Failed to initialize database.");

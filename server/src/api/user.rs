@@ -1,4 +1,5 @@
 use actix_web::{post, get, HttpResponse };
+use super::database::user;
 
 #[post("/api/users/v1/register")]
 pub async fn register() -> HttpResponse {
