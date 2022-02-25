@@ -4,11 +4,12 @@ use totp_lite::{totp, Sha512};
 
 #[derive(Debug)]
 pub struct User {
-    login: String,
-    display_name: String,
-    totp_seed: String,
-    created_at: String,
-    last_login: String
+    pub id: i64,
+    pub login: String,
+    pub display_name: String,
+    pub totp_seed: String,
+    pub created_at: String,
+    pub last_login: String
 }
 
 pub fn initialize_user_table() -> Result<(), rusqlite::Error> {
@@ -16,12 +17,12 @@ pub fn initialize_user_table() -> Result<(), rusqlite::Error> {
 
     match conn.execute(
         "CREATE TABLE IF NOT EXISTS user (
-                id TEXT  NOT NULL PRIMARY KEY , -- user id
+                id INTEGER PRIMARY KEY AUTOINCREMENT  , -- user id
                 login TEXT UNIQUE, -- user login
                 display_name TEXT, -- display name
                 totp_seed TEXT, -- user otp seed if set to null users can't login
                 created_at TEXT NOT NULL DEFAULT (datetime('now')), -- account creation date
-                last_login TEXT
+                last_login TEXT NOT NULL DEFAULT ('')
             );
          )",
         [],
@@ -44,4 +45,24 @@ pub fn insert_user(login: String, display_name: String) -> Result<String, rusqli
         Ok(_) => { Ok(totp_seed) }
         Err(err) => { Err(err) }
     }
+}
+
+pub fn select_user(login: String) -> Result<User, rusqlite::Error> {
+    let conn = Connection::open("server.db")?;
+
+    let mut smt = conn.prepare(
+        "SELECT * FROM user"
+    )?;
+    let mut user_iter = smt.query_map([], |row| {
+        Ok(User {
+            id: row.get(0)?,
+            login: row.get(1)?,
+            display_name: row.get(2)?,
+            totp_seed: row.get(3)?,
+            created_at: row.get(4)?,
+            last_login: row.get(5)?,
+        })
+    })?;
+    
+    return user_iter.next().unwrap();
 }

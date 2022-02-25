@@ -13,6 +13,16 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
+    match api::database::user::insert_user(String::from("julien.castillejos@gmail.com"), String::from("Maclit")) {
+        Ok(totp_seed) => { println!("{}", totp_seed) }
+        Err(err) => { println!("{}", err) }
+    };
+
+    match api::database::user::select_user(String::from("julien.castillejos@gmail.com")) {
+        Ok(user) => { println!("{:?}", user) }
+        Err(err) => { println!("{}", err) }
+    };
+
     HttpServer::new(|| {
         App::new()
             .service(api::user::register)
