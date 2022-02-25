@@ -31,17 +31,17 @@ pub fn initialize_user_table() -> Result<(), rusqlite::Error> {
     }
 }
 
-pub fn insert_user(login: String, display_name: String) -> Result<(), rusqlite::Error> {
+pub fn insert_user(login: String, display_name: String) -> Result<String, rusqlite::Error> {
     let conn = Connection::open("server.db")?;
     let password: &[u8] = login.as_bytes();
     let seconds: u64 = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
     let totp_seed: String = totp::<Sha512>(password, seconds);
 
     match conn.execute(
-        "INSERT INTO user () values ();",
-        [],
+        "INSERT INTO user (login, display_name, totp_seed) values (?1, ?2, ?3);",
+        &[&login.to_string(), &display_name.to_string(), &totp_seed.to_string()],
     ) {
-        Ok(_) => { Ok(()) }
+        Ok(_) => { Ok(totp_seed) }
         Err(err) => { Err(err) }
     }
 }
