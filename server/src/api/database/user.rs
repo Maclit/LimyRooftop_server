@@ -51,9 +51,10 @@ pub fn select_user(login: String) -> Result<User, rusqlite::Error> {
     let conn = Connection::open("server.db")?;
 
     let mut smt = conn.prepare(
-        "SELECT * FROM user"
+        "SELECT * FROM user
+        WHERE user.login == ?1"
     )?;
-    let mut user_iter = smt.query_map([], |row| {
+    let mut user_iter = smt.query_map(&[&login.to_string()], |row| {
         Ok(User {
             id: row.get(0)?,
             login: row.get(1)?,
@@ -63,6 +64,13 @@ pub fn select_user(login: String) -> Result<User, rusqlite::Error> {
             last_login: row.get(5)?,
         })
     })?;
-    
-    return user_iter.next().unwrap();
+   
+    let user = user_iter.next();
+    if user.is_some() {
+        return match user.unwrap() {
+            Ok(user) => { Ok(user) }
+            Err(err) => { Err(err) }
+        }
+    }
+    return Err(rusqlite::Error::QueryReturnedNoRows)
 }
