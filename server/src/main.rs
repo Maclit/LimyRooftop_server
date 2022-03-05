@@ -1,11 +1,12 @@
 use std::process::exit;
 use actix_web::{App, HttpServer};
 
+mod database;
 mod api;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    match api::database::initialize_database() {
+    match database::initialize_database() {
         Ok(_) => { println!("Database initialized successfully!"); }
         Err(_) => {
             println!("Failed to initialize database.");
@@ -13,12 +14,12 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
-    match api::database::user::insert_user(String::from("julien.castillejos@gmail.com"), String::from("Maclit")) {
+    match database::user::insert_user(String::from("julien.castillejos@gmail.com"), String::from("Maclit")) {
         Ok(totp_seed) => { println!("{}", totp_seed) }
         Err(err) => { println!("{}", err) }
     };
 
-    match api::database::user::select_user(String::from("julien.castillejos@gmail.com")) {
+    match database::user::select_user(String::from("julien.castillejos@gmail.com")) {
         Ok(user) => { println!("{:?}", user) }
         Err(err) => { println!("{}", err) }
     };
